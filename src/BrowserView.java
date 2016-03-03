@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -10,13 +11,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+//import javafx.scene.control.Alert;
+//import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+//import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -117,10 +118,10 @@ public class BrowserView {
      * Display given message as an error in the GUI.
      */
     public void showError (String message) {
-        Alert alert = new Alert(AlertType.ERROR);
+        /*Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(myResources.getString("ErrorTitle"));
         alert.setContentText(message);
-        alert.showAndWait();
+        alert.showAndWait();*/
     }
 
     // move to the next URL in the history
@@ -155,7 +156,7 @@ public class BrowserView {
 
     // prompt user for name of favorite to add to collection
     private void addFavorite () {
-        TextInputDialog input = new TextInputDialog("");
+        /*TextInputDialog input = new TextInputDialog("");
         input.setTitle(myResources.getString("FavoritePromptTitle"));
         input.setContentText(myResources.getString("FavoritePrompt"));
         Optional<String> response = input.showAndWait();
@@ -163,7 +164,7 @@ public class BrowserView {
         if (response.isPresent()) {
             myModel.addFavorite(response.get());
             myFavorites.getItems().add(response.get());
-        }
+        }*/
     }
 
     // only enable buttons when useful to user
@@ -236,7 +237,8 @@ public class BrowserView {
     }
 
     // makes a button using either an image or a label
-    private Button makeButton (String property, EventHandler<ActionEvent> handler) {
+    //private Button makeButton (String property, EventHandler<ActionEvent> handler) {
+    private Button makeButton (String property, String handler) {
         // represent all supported image suffixes
         final String IMAGEFILE_SUFFIXES = 
             String.format(".*\\.(%s)", String.join("|", ImageIO.getReaderFileSuffixes()));
@@ -249,7 +251,17 @@ public class BrowserView {
         } else {
             result.setText(label);
         }
-        result.setOnAction(handler);
+        
+        Method m;
+		try {
+			m = this.getClass().getMethod(handler);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        //m.invoke(this);
+        
+        result.setOnAction(e -> m.invoke(this));
         return result;
     }
 
